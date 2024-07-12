@@ -1,7 +1,8 @@
-import { createResult } from "@common/result";
-import { refreshTokenRepository } from "@models/prismaClient";
-import { GenerateRefreshToken } from "@provider/GenerateRefreshToken";
-import { generateTokenProvider } from "@provider/generateTokenProvider";
+import { createResult } from "../common/result";
+import { refreshTokenRepository } from "../models/prismaClient";
+import { GenerateRefreshToken } from "../provider/GenerateRefreshToken";
+import { generateTokenProvider } from "../provider/generateTokenProvider";
+
 
 
 async function createToken(userId: string) {

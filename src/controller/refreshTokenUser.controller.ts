@@ -1,7 +1,7 @@
-import { createErrorResponse } from "@common/error.resource";
-import { HttpStatus } from "@common/httpStatus";
-import { refreshTokenUserServices } from "@services/refreshtokenUser.services";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { refreshTokenUserServices } from "../services/refreshtokenUser.services";
+import { HttpStatus } from "../common/httpStatus";
+import { createErrorResponse } from "../common/error.resource";
 
 
 async function refreshToken(request: FastifyRequest<{ Body: { refresh_token: string } }>, reply: FastifyReply) {

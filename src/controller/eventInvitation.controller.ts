@@ -1,11 +1,12 @@
-import { createErrorResponse } from "@common/error.resource";
-import { HttpStatus } from "@common/httpStatus";
-import { eventInvitationServices } from "@services/eventInvitations.services";
+
 import { FastifyReply, FastifyRequest } from "fastify";
 import { eventController } from "./event.controller";
 import { userController } from "./user.controller";
-import { eventServices } from "@services/event.services";
 import { webSocketController } from "./webSocket.controller";
+import { eventInvitationServices } from "../services/eventInvitations.services";
+import { createErrorResponse } from "../common/error.resource";
+import { HttpStatus } from "../common/httpStatus";
+import { eventServices } from "../services/event.services";
 
 async function getInvitations(request: FastifyRequest<{ Params: { eventId: string } }>, reply: FastifyReply) {
   const { eventId } = request.params

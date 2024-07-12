@@ -1,6 +1,6 @@
 
 import { WebSocket } from "@fastify/websocket";
-import { eventConnections, userConnections } from "@routes/webSocket.routes";
+import { eventConnections, userConnections } from "../routes/webSocket.routes";
 
 function sendEventUpdate(eventId: string, data: any) {
   if (eventConnections.has(eventId)) {

@@ -1,8 +1,8 @@
-import { createResult } from "@common/result";
-import { refreshTokenRepository } from "@models/prismaClient";
-import { GenerateRefreshToken } from "@provider/GenerateRefreshToken";
-import { generateTokenProvider } from "@provider/generateTokenProvider";
 import dayjs from "dayjs";
+import { refreshTokenRepository } from "../models/prismaClient";
+import { createResult } from "../common/result";
+import { generateTokenProvider } from "../provider/generateTokenProvider";
+import { GenerateRefreshToken } from "../provider/GenerateRefreshToken";
 
 async function refreshTokenUser(refreshTokenId: string) {
   const refreshToken = await refreshTokenRepository.findFirst({

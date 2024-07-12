@@ -1,6 +1,6 @@
-import { createResult } from "@common/result"
-import { eventInvitationRepository } from "@models/prismaClient"
 import { EventInvitationStatus } from "@prisma/client"
+import { eventInvitationRepository } from "../models/prismaClient"
+import { createResult } from "../common/result"
 
 async function getInvitationByEventId(eventId: string) {
   const invitations = await eventInvitationRepository.findMany({

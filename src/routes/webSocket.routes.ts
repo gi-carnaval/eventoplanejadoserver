@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { WebSocket } from "@fastify/websocket";
-import { webSocketController } from "@controller/webSocket.controller";
+import { webSocketController } from "../controller/webSocket.controller";
 
 export const eventConnections: Map<string, WebSocket[]> = new Map();
 export const userConnections: Map<string, WebSocket[]> = new Map();

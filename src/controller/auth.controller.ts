@@ -1,10 +1,11 @@
-import { createErrorResponse } from "@common/error.resource";
-import { HttpStatus } from "@common/httpStatus";
-import { api } from "@lib/axios";
-import { authServices } from "@services/auth.services";
-import { userServices } from "@services/user.services";
+
 import { FastifyReply, FastifyRequest } from "fastify";
-import { authenticateUserBody } from "resource/auth.resource";
+import { authenticateUserBody } from "../resource/auth.resource";
+import { HttpStatus } from "../common/httpStatus";
+import { createErrorResponse } from "../common/error.resource";
+import { userServices } from "../services/user.services";
+import { authServices } from "../services/auth.services";
+import { api } from "../lib/axios";
 
 
 async function authenticateUser(request: FastifyRequest<{ Body: authenticateUserBody }>, reply: FastifyReply) {

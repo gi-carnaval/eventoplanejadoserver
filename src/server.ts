@@ -1,14 +1,14 @@
 import Fastify from "fastify";
 import cors from '@fastify/cors'
-import { authRoutes } from "@routes/auth.routes";
-import { testRoutes } from "@routes/testRoutes";
-import { refreshTokenRoutes } from "@routes/refreshToken.routes";
-import { userRoutes } from "@routes/user.routes";
-import { eventRoutes } from "@routes/event.routes";
+import { userRoutes } from "./routes/user.routes";
+import { eventRoutes } from "./routes/event.routes";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { eventInvitationRoutes } from "@routes/eventInvitation.routes";
+import { eventInvitationRoutes } from "./routes/eventInvitation.routes";
 import { fastifyWebsocket } from "@fastify/websocket"
-import { wsRoutes } from "@routes/webSocket.routes";
+import { wsRoutes } from "./routes/webSocket.routes";
+import { authRoutes } from "./routes/auth.routes";
+import { testRoutes } from "./routes/testRoutes";
+import { refreshTokenRoutes } from "./routes/refreshToken.routes";
 
 const fastify = Fastify({
   logger: true

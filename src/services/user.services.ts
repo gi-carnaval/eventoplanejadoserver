@@ -1,6 +1,6 @@
-import { createResult } from "@common/result"
-import { userRepository } from "@models/prismaClient"
-import { createUser, IUser } from "resource/auth.resource"
+import { createResult } from "../common/result"
+import { userRepository } from "../models/prismaClient"
+import { createUser, IUser } from "../resource/auth.resource"
 
 
 async function getUserByEmail(email: string){

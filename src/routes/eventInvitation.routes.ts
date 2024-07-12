@@ -1,6 +1,7 @@
-import { eventInvitationController } from "@controller/eventInvitation.controller";
-import { ensureAuthenticated } from "@middleware/ensureAuthenticated";
+
 import { FastifyInstance } from "fastify";
+import { ensureAuthenticated } from "../middleware/ensureAuthenticated";
+import { eventInvitationController } from "../controller/eventInvitation.controller";
 
 async function eventInvitationRoutes(fastify: FastifyInstance) {
   fastify.route({

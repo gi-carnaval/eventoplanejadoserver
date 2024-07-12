@@ -11,17 +11,18 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@common/*": ["./common/*"],
-      "@controller/*": ["./controller/*"],
-      "@lib/*": ["./lib/*"],
-      "@middleware/*": ["./middleware/*"],
-      "@models/*": ["./models/*"],
-      "@provider/*": ["./provider/*"],
-      "@resource/*": ["./resource/*"],
-      "@routes/*": ["./routes/*"],
-      "@services/*": ["./services/*"],
-    }
+    // "baseUrl": "./src/",
+    // "paths": {
+    //   "@common/*": ["./common/*"],
+    //   "@controller/*": ["./controller/*"],
+    //   "@lib/*": ["./lib/*"],
+    //   "@middleware/*": ["./middleware/*"],
+    //   "@models/*": ["./models/*"],
+    //   "@provider/*": ["./provider/*"],
+    //   "@resource/*": ["./resource/*"],
+    //   "@routes/*": ["./routes/*"],
+    //   "@services/*": ["./services/*"],
+    //   "@schemas/*": ["./schemas/*"],
+    // }
   }
 }

@@ -1,6 +1,6 @@
-import { createResult } from "@common/result"
-import { eventRepository, userRepository } from "@models/prismaClient"
-import { EventDataProps, EventProps } from "@resource/event.resource"
+import { createResult } from "../common/result"
+import { eventRepository, userRepository } from "../models/prismaClient"
+import { EventDataProps, EventProps } from "../resource/event.resource"
 
 async function getEventsByOrganizer(userId: string) {
   const events = await eventRepository.findMany({

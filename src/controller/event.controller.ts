@@ -1,11 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { userServices } from "@services/user.services";
-import { HttpStatus } from "@common/httpStatus";
-import { createErrorResponse } from "@common/error.resource";
-import { eventServices } from "@services/event.services";
-import { GetEventRequest, GetEventsRequest, PostEventRequest } from "@resource/event.resource";
-import { eventSchema } from "schemas/eventSchemas";
 import { z } from "zod";
+import { GetEventRequest, GetEventsRequest, PostEventRequest } from "../resource/event.resource";
+import { userServices } from "../services/user.services";
+import { HttpStatus } from "../common/httpStatus";
+import { createErrorResponse } from "../common/error.resource";
+import { eventServices } from "../services/event.services";
+import { eventSchema } from "../schemas/eventSchemas";
 
 async function getOrganizedEvents(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
   const { userId } = request.params

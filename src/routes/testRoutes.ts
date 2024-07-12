@@ -1,5 +1,5 @@
-import { ensureAuthenticated } from "@middleware/ensureAuthenticated";
 import { FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface } from "fastify";
+import { ensureAuthenticated } from "../middleware/ensureAuthenticated";
 
 interface GetEventsRequest extends RouteGenericInterface {
   Params: {

@@ -1,6 +1,7 @@
-import { eventController } from "@controller/event.controller";
-import { ensureAuthenticated } from "@middleware/ensureAuthenticated";
+
 import { FastifyInstance } from "fastify";
+import { ensureAuthenticated } from "../middleware/ensureAuthenticated";
+import { eventController } from "../controller/event.controller";
 
 async function eventRoutes(fastify: FastifyInstance) {
   fastify.get('/events/:userId', { preHandler: ensureAuthenticated }, eventController.getAllEventsByUser)

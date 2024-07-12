@@ -1,7 +1,8 @@
-import { createErrorResponse } from "@common/error.resource";
-import { HttpStatus } from "@common/httpStatus";
+
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import { verify } from "jsonwebtoken";
+import { HttpStatus } from "../common/httpStatus";
+import { createErrorResponse } from "../common/error.resource";
 
 export function ensureAuthenticated(request: FastifyRequest, reply: FastifyReply, next: HookHandlerDoneFunction) {
   const authToken = request.headers.authorization

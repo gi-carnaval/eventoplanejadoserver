@@ -1,7 +1,8 @@
-import { createErrorResponse } from "@common/error.resource";
-import { HttpStatus } from "@common/httpStatus";
-import { userServices } from "@services/user.services";
+
 import { FastifyReply, FastifyRequest } from "fastify";
+import { userServices } from "../services/user.services";
+import { HttpStatus } from "../common/httpStatus";
+import { createErrorResponse } from "../common/error.resource";
 
 
 async function getUser(request: FastifyRequest<{ Params: { userId: string } }>, reply: FastifyReply) {
