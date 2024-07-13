@@ -26,9 +26,11 @@ async function getOrganizedEvents(request: FastifyRequest<GetEventsRequest>, rep
     return reply.status(HttpStatus.OK).send(events.value)
   }
 
-  const eventsWithStatus = eventServices.eventsWithStatus(events.value)
+  const eventsWithStatus = eventServices.eventsWithStatus(events.value.events)
 
-  return reply.status(HttpStatus.OK).send(eventsWithStatus)
+  const resposne = { events: eventsWithStatus, metrics: events.value.metrics }
+
+  return reply.status(HttpStatus.OK).send(resposne)
 }
 
 async function getAllEventsByUser(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
@@ -109,7 +111,7 @@ async function getInvitedEvent(request: FastifyRequest<GetEventRequest>, reply: 
   return reply.status(HttpStatus.OK).send(eventWithStatus)
 }
 
-async function checkIfEventExists(reply: FastifyReply, eventId: string){
+async function checkIfEventExists(reply: FastifyReply, eventId: string) {
   const eventExists = await eventServices.getEvent(eventId)
 
   if (eventExists.isError()) {
@@ -129,7 +131,6 @@ async function checkIfUserAlreadyIsInEvent(reply: FastifyReply, eventId: string,
 }
 
 async function saveEvent(request: FastifyRequest<PostEventRequest>, reply: FastifyReply) {
-
   try {
     const { eventData, userId } = eventSchema.parse(request.body)
 
@@ -140,7 +141,7 @@ async function saveEvent(request: FastifyRequest<PostEventRequest>, reply: Fasti
     }
 
     await eventServices.saveEvent(eventData, userId)
-    
+
   } catch (error) {
     if (error instanceof z.ZodError) {
       reply.status(400).send({ error: error.errors });
@@ -148,7 +149,26 @@ async function saveEvent(request: FastifyRequest<PostEventRequest>, reply: Fasti
       reply.status(500).send({ error: "Internal Server Error" });
     }
   }
+}
 
+async function getInvitedEventRequest(request: FastifyRequest<{ Params: { eventId: string } }>, reply: FastifyReply) {
+  const { eventId } = request.params
+
+  const eventExists = await eventServices.getEvent(eventId)
+
+  if (eventExists.isError()) {
+    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${eventExists?.error}`))
+  }
+
+  const event = await eventServices.getEventInvitedEventRequest(eventId)
+
+  console.log("\n\n\n\n\n\n\n\n", event.value)
+
+  if (event.isError()) {
+    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${event?.error}`))
+  }
+
+  return reply.status(HttpStatus.OK).send(event.value)
 
 }
 
@@ -160,5 +180,6 @@ export const eventController = {
   getOrganizedEvent,
   getInvitedEvent,
   checkIfEventExists,
-  checkIfUserAlreadyIsInEvent
+  checkIfUserAlreadyIsInEvent,
+  getInvitedEventRequest
 }

@@ -19,8 +19,14 @@ async function eventInvitationRoutes(fastify: FastifyInstance) {
   fastify.route({
     method: "GET",
     url: "/eventInvitations/:organizerId",
-    // preHandler: ensureAuthenticated,
+    preHandler: ensureAuthenticated,
     handler: eventInvitationController.getOrganizerInvitations,
+  }),
+  fastify.route({
+    method: "GET",
+    url: "/eventInvitations/invitations/:guestId",
+    // preHandler: ensureAuthenticated,
+    handler: eventInvitationController.getGuestInvitations,
   })
   fastify.route({
     method: "post",

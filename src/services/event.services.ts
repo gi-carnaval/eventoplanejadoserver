@@ -39,11 +39,72 @@ async function getEventsByOrganizer(userId: string) {
     }
   })
 
+  const createdEvents = await userRepository.findMany({
+    select: {
+      _count: {
+        select: {
+          EventUser: {
+            where: {
+              userId: userId,
+              role: "ORGANIZER"
+            }
+          }
+        }
+      }
+    },
+    where: {
+      id: userId
+    }
+  })
+  const invitedPeopleEvents = await eventRepository.findMany({
+    select: {
+      _count: {
+        select: {
+          EventUser: {
+            where: {
+              role: "PARTICIPANT",
+            }
+          },
+        }
+      }
+    },
+    where: {
+      EventUser: {
+        some: {
+          userId,
+          role: "ORGANIZER"
+        }
+      }
+    }
+  })
+  const invitedEventsObj = await userRepository.findMany({
+    select: {
+      _count: {
+        select: {
+          EventUser: {
+            where: {
+              userId,
+              role: "PARTICIPANT"
+            }
+          }
+        }
+      }
+    }
+  })
+
+  const invitedPeople = invitedPeopleEvents.reduce((acc, value) => {
+    return value._count.EventUser + acc
+  }, 0)
+  const invitedEvents = invitedEventsObj.reduce((acc, value) => {
+    return value._count.EventUser + acc
+  }, 0)
+
+  const metrics = { createdEvents: createdEvents[0]._count.EventUser, invitedPeople, invitedEvents }
   if (!events) {
     return createResult(null, "Eventos não encontrados")
   }
 
-  return createResult(events, null)
+  return createResult({events, metrics}, null)
 }
 
 async function getAllEventsByUser(userId: string) {
@@ -288,6 +349,39 @@ async function addUserToEvent(eventId: string, guestId: string) {
   return createResult(event, null)
 }
 
+async function getEventInvitedEventRequest(id: string) {
+  const event = await eventRepository.findFirst({
+    select: {
+      name: true,
+      description: true,
+      startDateTime: true,
+      address: true,
+      EventUser: {
+        select: {
+          user: {
+            select: {
+              name: true,
+              picture: true,
+            }
+          }
+        },
+        where: {
+          role: "ORGANIZER"
+        }
+      }
+    },
+    where: {
+      id
+    }
+  })
+
+  if (!event) {
+    return createResult(null, "Erro ao atualizar evento")
+  }
+
+  return createResult(event, null)
+}
+
 function eventsWithStatus(events: EventProps[]) {
   return events
     .map(event => ({
@@ -330,5 +424,6 @@ export const eventServices = {
   getOrganizedEvent,
   singleEventWithStatus,
   getInvitedEvent,
-  addUserToEvent
+  addUserToEvent,
+  getEventInvitedEventRequest
 }

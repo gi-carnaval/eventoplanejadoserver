@@ -186,7 +186,34 @@ async function getInvitationsByOrganizer(organizerId: string) {
   }
 
   return createResult(invitation, null)
+}
 
+async function getInvitationsByUser(userId: string) {
+  const invitations = await eventInvitationRepository.findMany({
+    select: {
+      event: {
+        select: {
+          name: true,
+          address: true,
+          startDateTime: true,
+        }
+      },
+      status: true,
+      id: true
+    },
+    where: {
+      userId,     
+    },
+    orderBy: {
+      status: "asc"
+    }
+  })
+
+  if (!invitations) {
+    return createResult("Nenhuma solicitação", null)
+  }
+
+  return createResult(invitations, null)
 }
 
 async function createInvitation(eventId: string, guestId: string) {
@@ -213,5 +240,6 @@ export const eventInvitationServices = {
   getInvitationIfUserOrganizer,
   updateInvitation,
   getCountInvitationsByOrganizer,
-  getInvitationsByOrganizer
+  getInvitationsByOrganizer,
+  getInvitationsByUser
 }

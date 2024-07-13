@@ -141,6 +141,19 @@ async function getOrganizerInvitations(request: FastifyRequest<{ Params: { organ
   return reply.status(HttpStatus.OK).send(eventsInvitations.value)
 }
 
+async function getGuestInvitations(request: FastifyRequest<{ Params: { guestId: string } }>, reply: FastifyReply) {
+  const { guestId } = request.params
+
+  await userController.checkIfUserExists(reply, guestId)
+  const eventsInvitations = await eventInvitationServices.getInvitationsByUser(guestId)
+
+  if (eventsInvitations.isError()) {
+    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${eventsInvitations?.error}`))
+  }
+
+  return reply.status(HttpStatus.OK).send(eventsInvitations.value)
+}
+
 async function checkIfUserIsOrganizer(reply: FastifyReply, invitationId: string, organizerId: string) {
   const isUserAOrganizer = await eventInvitationServices.getInvitationIfUserOrganizer(invitationId, organizerId)
   if (isUserAOrganizer.isError()) {
@@ -161,5 +174,6 @@ export const eventInvitationController = {
   acceptInvitation,
   recuseInvitation,
   getCountOrganizerInvitations,
-  getOrganizerInvitations
+  getOrganizerInvitations,
+  getGuestInvitations
 }
