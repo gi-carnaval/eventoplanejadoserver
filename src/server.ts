@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { FastifyReply } from "fastify";
 import cors from '@fastify/cors'
 import { userRoutes } from "./routes/user.routes";
 import { eventRoutes } from "./routes/event.routes";
@@ -16,6 +16,10 @@ const fastify = Fastify({
 
 fastify.register(fastifyWebsocket, {
   options: { maxPayload: 1048576, clientTracking: true },
+})
+
+fastify.get('/', async function handler (request, reply) {
+  return { hello: 'world' }
 })
 
 fastify.register(wsRoutes)

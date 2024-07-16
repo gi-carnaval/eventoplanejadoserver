@@ -3,7 +3,7 @@ import { eventRepository, userRepository } from "../models/prismaClient"
 import { EventDataProps, EventProps } from "../resource/event.resource"
 
 async function getEventsByOrganizer(userId: string) {
-  const events = await eventRepository.findMany({
+  const organizedEvents = await eventRepository.findMany({
     include: {
       EventUser: {
         select: {
@@ -92,30 +92,12 @@ async function getEventsByOrganizer(userId: string) {
     }
   })
 
-  const invitedPeople = invitedPeopleEvents.reduce((acc, value) => {
-    return value._count.EventUser + acc
-  }, 0)
-  const invitedEvents = invitedEventsObj.reduce((acc, value) => {
-    return value._count.EventUser + acc
-  }, 0)
-
-  const metrics = { createdEvents: createdEvents[0]._count.EventUser, invitedPeople, invitedEvents }
-  if (!events) {
-    return createResult(null, "Eventos não encontrados")
-  }
-
-  return createResult({events, metrics}, null)
-}
-
-async function getAllEventsByUser(userId: string) {
-  const events = await eventRepository.findMany({
+  const invitedEvents = await eventRepository.findMany({
     where: {
       EventUser: {
         some: {
           userId,
-          role: {
-            not: "ORGANIZER"
-          }
+          role: "PARTICIPANT"
         },
       }
     },
@@ -124,11 +106,24 @@ async function getAllEventsByUser(userId: string) {
     }
   })
 
-  if (!events) {
+  if (!invitedEvents) {
     return createResult(null, "Eventos não encontrados")
   }
 
-  return createResult(events, null)
+  const invitedPeople = invitedPeopleEvents.reduce((acc, value) => {
+    return value._count.EventUser + acc
+  }, 0)
+  const invitedEventsCount = invitedEventsObj.reduce((acc, value) => {
+    return value._count.EventUser + acc
+  }, 0)
+
+  const metrics = { createdEvents: createdEvents[0]._count.EventUser, invitedPeople, invitedEventsCount }
+
+  if (!organizedEvents) {
+    return createResult(null, "Eventos não encontrados")
+  }
+
+  return createResult({ organizedEvents, invitedEvents, metrics }, null)
 }
 
 async function saveEvent(eventData: EventDataProps, userId: string) {
@@ -161,69 +156,6 @@ async function saveEvent(eventData: EventDataProps, userId: string) {
 
   return createResult(event, null)
 
-}
-async function getMetrics(userId: string) {
-  const createdEvents = await userRepository.findMany({
-    select: {
-      _count: {
-        select: {
-          EventUser: {
-            where: {
-              userId: userId,
-              role: "ORGANIZER"
-            }
-          }
-        }
-      }
-    },
-    where: {
-      id: userId
-    }
-  })
-  const invitedPeopleEvents = await eventRepository.findMany({
-    select: {
-      _count: {
-        select: {
-          EventUser: {
-            where: {
-              role: "PARTICIPANT",
-            }
-          },
-        }
-      }
-    },
-    where: {
-      EventUser: {
-        some: {
-          userId,
-          role: "ORGANIZER"
-        }
-      }
-    }
-  })
-  const invitedEventsObj = await userRepository.findMany({
-    select: {
-      _count: {
-        select: {
-          EventUser: {
-            where: {
-              userId,
-              role: "PARTICIPANT"
-            }
-          }
-        }
-      }
-    }
-  })
-
-  const invitedPeople = invitedPeopleEvents.reduce((acc, value) => {
-    return value._count.EventUser + acc
-  }, 0)
-  const invitedEvents = invitedEventsObj.reduce((acc, value) => {
-    return value._count.EventUser + acc
-  }, 0)
-
-  return createResult({ createdEvents: createdEvents[0]._count.EventUser, invitedPeople, invitedEvents }, null)
 }
 
 async function getOrganizedEvent(eventId: string, userId: string) {
@@ -416,11 +348,9 @@ function getEventStatus(startDateTime: Date, endDateTime: Date) {
 export const eventServices = {
   getEvent,
   getEventsByOrganizer,
-  getAllEventsByUser,
   getEventStatus,
   eventsWithStatus,
   saveEvent,
-  getMetrics,
   getOrganizedEvent,
   singleEventWithStatus,
   getInvitedEvent,

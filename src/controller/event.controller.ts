@@ -7,7 +7,7 @@ import { createErrorResponse } from "../common/error.resource";
 import { eventServices } from "../services/event.services";
 import { eventSchema } from "../schemas/eventSchemas";
 
-async function getOrganizedEvents(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
+async function getUserEvents(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
   const { userId } = request.params
 
   const userExists = await userServices.getUserByUserId(userId)
@@ -26,53 +26,12 @@ async function getOrganizedEvents(request: FastifyRequest<GetEventsRequest>, rep
     return reply.status(HttpStatus.OK).send(events.value)
   }
 
-  const eventsWithStatus = eventServices.eventsWithStatus(events.value.events)
+  const organizedEventsWithStatus = eventServices.eventsWithStatus(events.value.organizedEvents)
+  const invitedEventsWithStatus = eventServices.eventsWithStatus(events.value.invitedEvents)
 
-  const resposne = { events: eventsWithStatus, metrics: events.value.metrics }
+  const response = { organizedEvents: organizedEventsWithStatus, invitedEvents: invitedEventsWithStatus, metrics: events.value.metrics }
 
-  return reply.status(HttpStatus.OK).send(resposne)
-}
-
-async function getAllEventsByUser(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
-  const { userId } = request.params
-
-  const userExists = await userServices.getUserByUserId(userId)
-
-  if (userExists.isError()) {
-    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${userExists?.error}`))
-  }
-
-  const events = await eventServices.getAllEventsByUser(userId)
-
-  if (events.isError()) {
-    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${events.error}`))
-  }
-
-  if (!events.value) {
-    return reply.status(HttpStatus.OK).send(events.value)
-  }
-
-  const eventsWithStatus = eventServices.eventsWithStatus(events.value)
-
-  return reply.status(HttpStatus.OK).send(eventsWithStatus)
-}
-
-async function getEventsMetrics(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
-  const { userId } = request.params
-
-  const userExists = await userServices.getUserByUserId(userId)
-
-  if (userExists.isError()) {
-    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${userExists?.error}`))
-  }
-
-  const events = await eventServices.getMetrics(userId)
-
-  if (events.isError()) {
-    return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${events.error}`))
-  }
-
-  return reply.status(HttpStatus.OK).send(events.value)
+  return reply.status(HttpStatus.OK).send(response)
 }
 
 async function getOrganizedEvent(request: FastifyRequest<GetEventRequest>, reply: FastifyReply) {
@@ -162,8 +121,6 @@ async function getInvitedEventRequest(request: FastifyRequest<{ Params: { eventI
 
   const event = await eventServices.getEventInvitedEventRequest(eventId)
 
-  console.log("\n\n\n\n\n\n\n\n", event.value)
-
   if (event.isError()) {
     return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${event?.error}`))
   }
@@ -173,10 +130,8 @@ async function getInvitedEventRequest(request: FastifyRequest<{ Params: { eventI
 }
 
 export const eventController = {
-  getOrganizedEvents,
-  getAllEventsByUser,
+  getUserEvents,
   saveEvent,
-  getEventsMetrics,
   getOrganizedEvent,
   getInvitedEvent,
   checkIfEventExists,
