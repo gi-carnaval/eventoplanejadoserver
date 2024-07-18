@@ -26,3 +26,14 @@ export const eventSchema = z.object({
     invalid_type_error: "UserId must be a string"
   })
 })
+
+export const validadeGuestInviteSchema = z.object({
+  eventUserId: z.string({
+    required_error: "eventUserId is required",
+    invalid_type_error: "eventUserId must be a string"
+  }),
+  organizerId: z.string({
+    required_error: "organizerId is required",
+    invalid_type_error: "organizerId must be a string"
+  }),
+})

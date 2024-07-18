@@ -1,6 +1,6 @@
 import { createResult } from "../common/result"
-import { eventRepository, userRepository } from "../models/prismaClient"
-import { EventDataProps, EventProps } from "../resource/event.resource"
+import { eventRepository, eventUserRepository, userRepository } from "../models/prismaClient"
+import { EventDataProps, EventProps, EventUserStatusCheckerProps } from "../resource/event.resource"
 
 async function getEventsByOrganizer(userId: string) {
   const organizedEvents = await eventRepository.findMany({
@@ -174,11 +174,12 @@ async function getOrganizedEvent(eventId: string, userId: string) {
       EventUser: {
         select: {
           role: true,
+          eventUserStatus: true,
           user: {
             select: {
               name: true,
               email: true,
-              picture: true
+              picture: true,
             }
           }
         },
@@ -219,6 +220,16 @@ async function getOrganizedEvent(eventId: string, userId: string) {
 
 async function getInvitedEvent(eventId: string, userId: string) {
   const event = await eventRepository.findFirst({
+    include: {
+      EventUser: {
+        select: {
+          id: true,
+        },
+        where: {
+          userId
+        }
+      }
+    },
     where: {
       id: eventId,
       EventUser: {
@@ -330,7 +341,6 @@ function singleEventWithStatus(event: EventProps) {
   }
 }
 
-
 function getEventStatus(startDateTime: Date, endDateTime: Date) {
   const now = Date.now();
 
@@ -345,6 +355,114 @@ function getEventStatus(startDateTime: Date, endDateTime: Date) {
   return "SCHEDULED";
 }
 
+async function getEventUserByIds(eventId: string, eventUserId: string) {
+  const eventUser = await eventUserRepository.findUnique({
+    include: {
+      event: {
+        select: {
+          startDateTime: true,
+          endDateTime: true,
+        }
+      }
+    },
+    where: {
+      eventId,
+      id: eventUserId
+    }
+  })
+
+  if (!eventUser) {
+    return createResult(null, "Usuário não faz parte do evento")
+  }
+
+  return createResult(eventUser, null)
+}
+
+async function getEventByOrganizerAndEventId(eventId: string, userId: string) {
+  const eventUser = await eventRepository.findUnique({
+    where: {
+      EventUser: {
+        some: {
+          userId,
+          role: "ORGANIZER"
+        }
+      },
+      id: eventId
+    }
+  })
+
+  if (!eventUser) {
+    return createResult(null, "Usuário sem permissão")
+  }
+
+  return createResult(eventUser, null)
+}
+
+async function updateEventUser(eventUserId: string) {
+  const eventUser = await eventUserRepository.update({
+    data: {
+      checkInTime: new Date(),
+      eventUserStatus: EventUserStatus.CHECKED_IN
+    },
+    where: {
+      id: eventUserId
+    }
+  })
+
+  if (!eventUser) {
+    return createResult(null, "Erro ao atualizar usuário")
+  }
+
+  return createResult(eventUser, null)
+}
+
+async function getEventUserStatus(eventUser: EventUserStatusCheckerProps){
+
+  const dateNow = new Date()
+
+  if(eventUser.checkInTime === null) {
+    await eventUserRepository.update({
+      data: {
+        eventUserStatus: EventUserStatus.ACCEPTED
+      },
+      where: {
+        id: eventUser.id
+      }
+    })
+    return EventUserStatus.ACCEPTED
+  }
+
+  if(eventUser.event.startDateTime  >= dateNow && eventUser.event.endDateTime < new Date()) {
+    await eventUserRepository.update({
+      data: {
+        eventUserStatus: EventUserStatus.NO_SHOW
+      },
+      where: {
+        id: eventUser.id
+      }
+    })
+    return EventUserStatus.NO_SHOW
+  }
+
+  await eventUserRepository.update({
+    data: {
+      eventUserStatus: EventUserStatus.CHECKED_IN
+    },
+    where: {
+      id: eventUser.id
+    }
+  })
+  return EventUserStatus.CHECKED_IN
+  
+}
+
+enum EventUserStatus {
+  ACCEPTED = "ACCEPTED",  
+  CHECKED_IN = "CHECKED_IN",  
+  NO_SHOW = "NO_SHOW", 
+  CANCELLED = "CANCELLED"
+}
+
 export const eventServices = {
   getEvent,
   getEventsByOrganizer,
@@ -355,5 +473,9 @@ export const eventServices = {
   singleEventWithStatus,
   getInvitedEvent,
   addUserToEvent,
-  getEventInvitedEventRequest
+  getEventInvitedEventRequest,
+  getEventUserByIds,
+  getEventByOrganizerAndEventId,
+  updateEventUser,
+  getEventUserStatus
 }

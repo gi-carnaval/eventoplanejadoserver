@@ -38,6 +38,24 @@ export interface PostEventRequest extends RouteGenericInterface {
   }
 }
 
+interface Event {
+  startDateTime: Date;
+  endDateTime: Date;
+}
+
+interface EventUser {
+  id: string;
+  eventId: string;
+  userId: string;
+  role: "ORGANIZER" | "PARTICIPANT";
+  checkInTime: Date | null;
+  eventUserStatus: "ACCEPTED" | "CHECKED_IN" | "NO_SHOW" | "CANCELLED";
+}
+
+export interface EventUserStatusCheckerProps extends EventUser {
+  event: Event;
+}
+
 export function obterStatus(startDateTime: Date, endDateTime: Date): EventStatus {
   if (endDateTime < new Date()) {
     return EventStatus.COMPLETED;
@@ -48,6 +66,13 @@ export function obterStatus(startDateTime: Date, endDateTime: Date): EventStatus
   }
 
   return EventStatus.SCHEDULED;
+}
+
+export enum EventUserStatus {
+  ACCEPTED = "ACCEPTED",
+  CHECKED_IN = "CHECKED_IN",
+  NO_SHOW = "NO_SHOW",
+  CANCELLED = "CANCELLED"
 }
 
 enum EventStatus {

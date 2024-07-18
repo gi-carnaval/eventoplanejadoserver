@@ -5,7 +5,7 @@ import { userServices } from "../services/user.services";
 import { HttpStatus } from "../common/httpStatus";
 import { createErrorResponse } from "../common/error.resource";
 import { eventServices } from "../services/event.services";
-import { eventSchema } from "../schemas/eventSchemas";
+import { eventSchema, validadeGuestInviteSchema } from "../schemas/eventSchemas";
 
 async function getUserEvents(request: FastifyRequest<GetEventsRequest>, reply: FastifyReply) {
   const { userId } = request.params
@@ -126,7 +126,45 @@ async function getInvitedEventRequest(request: FastifyRequest<{ Params: { eventI
   }
 
   return reply.status(HttpStatus.OK).send(event.value)
+}
 
+async function validateGuestEntry(request: FastifyRequest<{ Params: { eventId: string }, Body: { eventUserId: string, organizerId: string } }>, reply: FastifyReply) {
+  try {
+    const { eventId } = request.params
+    const { eventUserId, organizerId } = validadeGuestInviteSchema.parse(request.body)
+
+    const isUserInThisEvent = await eventServices.getEventUserByIds(eventId, eventUserId)
+    const isOrganizerOfThisEvent = await eventServices.getEventByOrganizerAndEventId(eventId, organizerId)
+
+    if (isUserInThisEvent.isError() && !isUserInThisEvent.value) {
+      return reply.status(HttpStatus.NOT_FOUND).send(createErrorResponse(`${isUserInThisEvent?.error}`))
+    }
+
+    const eventUserStatus =  isUserInThisEvent.value && await eventServices.getEventUserStatus(isUserInThisEvent.value)
+
+    if(eventUserStatus === "CHECKED_IN") {
+      return reply.status(HttpStatus.CONFLICT).send(createErrorResponse("Usuário já validado"))
+    }
+
+    if (isOrganizerOfThisEvent.isError()) {
+      return reply.status(HttpStatus.UNAUTHORIZED).send(createErrorResponse(`${isOrganizerOfThisEvent?.error}`))
+    }
+
+    const eventUserUpdatedStatus = await eventServices.updateEventUser(eventUserId)
+
+    if (eventUserUpdatedStatus.isError()) {
+      return reply.status(HttpStatus.INTERNAL_SERVER_ERROR).send(createErrorResponse(`${eventUserUpdatedStatus?.error}`))
+    }
+
+    return reply.status(HttpStatus.OK).send("Usuário validado com sucesso")
+
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      reply.status(400).send({ error: error.errors });
+    } else {
+      reply.status(500).send({ error: "Internal Server Error" });
+    }
+  }
 }
 
 export const eventController = {
@@ -136,5 +174,6 @@ export const eventController = {
   getInvitedEvent,
   checkIfEventExists,
   checkIfUserAlreadyIsInEvent,
-  getInvitedEventRequest
+  getInvitedEventRequest,
+  validateGuestEntry
 }

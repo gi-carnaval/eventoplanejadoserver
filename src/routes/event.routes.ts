@@ -9,6 +9,7 @@ async function eventRoutes(fastify: FastifyInstance) {
   fastify.get('/events/:userId', { preHandler: ensureAuthenticated }, eventController.getUserEvents)
   fastify.get('/invited-event-request/:eventId', eventController.getInvitedEventRequest)
   fastify.post('/event', { preHandler: ensureAuthenticated }, eventController.saveEvent)
+  fastify.put('/event/:eventId', eventController.validateGuestEntry)
 }
 
 export { eventRoutes }
