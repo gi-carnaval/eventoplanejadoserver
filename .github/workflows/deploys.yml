@@ -12,23 +12,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy files to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with: 
+        
+      - name: Deploy with ssh
+        uses: appleboy/ssh-action@master
+        with:
           host: "167.88.39.32"
-          username: "root"
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "."
-          target: "/home/evento_planejado_api/eventoplanejadoserver/"
-      
-      - name: "Build application"
-        uses: appleboy/ssh-action@v1.0.3
-        with: 
-          host: "167.88.39.32"
-          username: "root"
+          username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            npm install
-            npm run build
-            pm2 restart api_evento_planejado_server
+            git pull origin master
+            git status
+            npm install --only=prod
+            npm build
+            pm2 restart api_evento_planejdo_server
+        
