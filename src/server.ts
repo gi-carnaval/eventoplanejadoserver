@@ -22,6 +22,10 @@ fastify.get('/', async function handler (request, reply) {
   return { hello: 'world' }
 })
 
+fastify.get('/testeDeDeploy', async function handler (request, reply) {
+  return { Funcionou: 'Esta mensagem representa o deploy automático funcionando' }
+})
+
 fastify.register(wsRoutes)
 
 fastify.register(async function (fastify) {
