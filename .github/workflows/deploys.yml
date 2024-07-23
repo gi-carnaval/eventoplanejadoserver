@@ -5,26 +5,30 @@ on:
       - main
 
 jobs: 
-  deploy:
+  build_deploy:
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY}}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keygen 167.88.39.32 >> ~/.ssh/know_hosts
-
-      - name: Deploy to VPS
-        run: |
-          ssh -i ~/.ssh/id_rsa root@167.88.39.32 << 'EOF'
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with: 
+          host: "167.88.39.32"
+          username: "root"
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "."
+          target: "/home/evento_planejado_api/eventoplanejadoserver/"
+      
+      - name: "Build application"
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: "167.88.39.32"
+          username: "root"
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            git pull origin main
             npm install
             npm run build
             pm2 restart api_evento_planejado_server
-          EOF
