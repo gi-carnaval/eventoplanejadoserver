@@ -25,5 +25,5 @@ jobs:
             git status
             npm install --only=prod
             npm build
-            pm2 restart api_evento_planejdo_server
+            pm2 restart api_evento_planejado_server
         
