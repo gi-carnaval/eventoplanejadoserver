@@ -22,8 +22,6 @@ jobs:
           key: ${{ secrets.HOSTINGER_GITHUB_SSH_KEY }}
           script: |
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            git pull origin main
-            git status
             npm install
             npm run build
             pm2 restart api_evento_planejado_server
