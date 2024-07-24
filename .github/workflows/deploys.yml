@@ -20,7 +20,7 @@ jobs:
           username: root
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            ssh -T git@github.com
+            ssh -vT git@github.com
             cd /home/evento_planejado_api/eventoplanejadoserver/
             git pull origin main
             git status
