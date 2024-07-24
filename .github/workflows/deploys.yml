@@ -14,12 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH for GitHub
+      - name: Set up SSH agent
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.GITHUB_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add <(echo "${{ secrets.HOSTINGER_SSH_KEY }}")
+        shell: bash
 
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
@@ -28,14 +27,10 @@ jobs:
           username: root
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            whoami
-            ls -la
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            echo "${{ secrets.GITHUB_SSH_KEY }}" > /root/.ssh/id_rsa
-            chmod 600 /root/.ssh/id_rsa
-            export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa'
-            git pull origin main
+            ls -la
+            git pull origin main || { echo "Failed to pull from git"; exit 1; }
             git status
             npm install
             npm run build
