@@ -1,18 +1,26 @@
-name: "Deploy para VPS"
+name: Deploy to VPS
+
 on:
   push:
     branches:
       - main
-  workflow_dispatch: 
+  workflow_dispatch:
 
-jobs: 
+jobs:
   build_deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
+      - name: Setup SSH for GitHub
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GITHUB_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -22,6 +30,7 @@ jobs:
           script: |
             whoami
             ls -la
+            pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
             git pull origin main
             git status
