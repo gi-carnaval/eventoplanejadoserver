@@ -4,20 +4,20 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch: 
 
-jobs:
+jobs: 
   build_deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        
       - name: Setup SSH for GitHub
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.GITHUB_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.GITHUB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
@@ -32,9 +32,9 @@ jobs:
             ls -la
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            echo "${{ secrets.GITHUB_SSH_KEY }}" > /root/.ssh/id_rsa
+            echo "${{ secrets.GITHUB_SSH_KEY }}" | tr -d '\r' > /root/.ssh/id_rsa
             chmod 600 /root/.ssh/id_rsa
-            export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa'
+            export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no'
             git pull origin main
             git status
             npm install
