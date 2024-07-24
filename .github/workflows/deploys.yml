@@ -32,7 +32,9 @@ jobs:
             ls -la
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            export GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa'
+            echo "${{ secrets.GITHUB_SSH_KEY }}" > /root/.ssh/id_rsa
+            chmod 600 /root/.ssh/id_rsa
+            export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa'
             git pull origin main
             git status
             npm install
