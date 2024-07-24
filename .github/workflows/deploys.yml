@@ -23,7 +23,7 @@ jobs:
             cd /home/evento_planejado_api/eventoplanejadoserver/
             git pull origin main
             git status
-            npm install --only=prod
+            npm install
             npm run build
             pm2 restart api_evento_planejado_server
         

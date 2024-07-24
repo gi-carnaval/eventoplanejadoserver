@@ -19,7 +19,7 @@ fastify.register(fastifyWebsocket, {
 })
 
 fastify.get('/', async function handler (request, reply) {
-  return { hello: 'world' }
+  return { hello: 'world - teste' }
 })
 
 fastify.get('/testeDeDeploy', async function handler (request, reply) {
