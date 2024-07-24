@@ -18,6 +18,7 @@ jobs:
         with:
           host: "167.88.39.32"
           username: root
+          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE}}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/evento_planejado_api/eventoplanejadoserver/
