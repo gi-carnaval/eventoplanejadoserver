@@ -18,6 +18,7 @@ jobs:
         with:
           host: ${{ secrets.HOSTINGER_REMOTE_SERVER_IP }}
           username: root
+          passphrase: ${{ secrets.HOSTINGER_SSH_PASSPHRASE }}
           key: ${{ secrets.HOSTINGER_GITHUB_SSH_KEY }}
           script: |
             cd /home/evento_planejado_api/eventoplanejadoserver/
