@@ -18,7 +18,7 @@ fastify.register(fastifyWebsocket, {
   options: { maxPayload: 1048576, clientTracking: true },
 })
 
-fastify.get('/', async function handler (request, reply) {
+fastify.get('/s', async function handler (request, reply) {
   return { hello: 'world - teste' }
 })
 
