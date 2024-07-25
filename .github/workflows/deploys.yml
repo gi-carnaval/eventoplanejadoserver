@@ -32,10 +32,6 @@ jobs:
           script: |
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            ssh -vT gi-carnaval@github.com
+            ssh -vT git@github.com
             ls -la
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
-            git status
-            npm install
-            npm run build
-            pm2 restart 0
