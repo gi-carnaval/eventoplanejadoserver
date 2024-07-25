@@ -14,7 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-     
+      - name: Set up SSH agent
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" >> ~/.ssh/id_rsa
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+        shell: bash
 
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
@@ -23,10 +32,10 @@ jobs:
           username: root
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            cd /home/evento_planejado_api/eventoplanejadoserver/
-            ssh -T git@github.com
             whoami
             pwd
+            cd /home/evento_planejado_api/eventoplanejadoserver/
+            ssh -T git@github.com
             ls -la
             git status
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
