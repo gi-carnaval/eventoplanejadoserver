@@ -17,7 +17,7 @@ jobs:
       - name: Set up SSH agent
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
@@ -31,10 +31,9 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             whoami
-            ssh-keyscan github.com
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            ssh -T git@github.com
+            ssh -vT git@github.com
             ls -la
             git status
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
