@@ -30,8 +30,9 @@ jobs:
           username: root
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
+            whoami
             pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            ssh -vT git@github.com
+            ssh -T git@github.com
             ls -la
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
