@@ -34,6 +34,7 @@ jobs:
             pwd
             ls -la .ssh/
             ssh -vT git@github.com
+            cd /home/evento_planejado_api/eventoplanejadoserver/
             ls -la
             git status
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
