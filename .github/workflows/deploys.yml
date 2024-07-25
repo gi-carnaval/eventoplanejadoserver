@@ -35,4 +35,5 @@ jobs:
             cd /home/evento_planejado_api/eventoplanejadoserver/
             ssh -T git@github.com
             ls -la
+            git status
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
