@@ -1,18 +1,28 @@
-name: "Deploy para VPS"
+name: Deploy to VPS
+
 on:
   push:
     branches:
       - main
-  workflow_dispatch: 
+  workflow_dispatch:
 
-jobs: 
+jobs:
   build_deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
+      - name: Set up SSH agent
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+        shell: bash
+
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -20,11 +30,12 @@ jobs:
           username: root
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            ssh -vT git@github.com
+            pwd
             cd /home/evento_planejado_api/eventoplanejadoserver/
-            git pull origin main
+            ssh -vT gi-carnaval@github.com
+            ls -la
+            git pull origin main || { echo "Failed to pull from git"; exit 1; }
             git status
             npm install
             npm run build
             pm2 restart 0
-        
