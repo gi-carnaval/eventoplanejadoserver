@@ -32,7 +32,7 @@ jobs:
           script: |
             whoami
             pwd
-            cd /home/evento_planejado_api/eventoplanejadoserver/
+            ls -la .ssh/
             ssh -vT git@github.com
             ls -la
             git status
