@@ -27,8 +27,9 @@ jobs:
         with:
           host: ${{ secrets.HOSTINGER_REMOTE_SERVER_IP }}
           username: root
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          
           script: |
+            eval "$(ssh-agent -s)"
             ssh-add ~/.ssh/github_hostinger
             cd /home/evento_planejado_api/eventoplanejadoserver/
             git status
