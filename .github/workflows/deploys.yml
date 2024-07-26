@@ -19,6 +19,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.HOSTINGER_SSH_KEY }}" >> ~/.ssh/github_hostinger
           chmod 600 ~/.ssh/github_hostinger
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/github_hostinger
 
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
@@ -28,7 +30,6 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             eval "$(ssh-agent -s)"
-            ssh-add ~/.ssh/github_hostinger
             cd /home/evento_planejado_api/eventoplanejadoserver/
             git status
             git pull origin main || { echo "Failed to pull from git"; exit 1; }
