@@ -21,7 +21,6 @@ jobs:
           chmod 600 ~/.ssh/github_hostinger
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/github_hostinger
-        shell: bash
 
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
@@ -33,6 +32,8 @@ jobs:
             whoami
             pwd
             ls -la .ssh/
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/github_hostinger
             ssh -vT git@github.com
             cd /home/evento_planejado_api/eventoplanejadoserver/
             ls -la
