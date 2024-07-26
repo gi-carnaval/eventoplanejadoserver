@@ -14,20 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH agent
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.HOSTINGER_SSH_KEY }}" >> ~/.ssh/github_hostinger
-          chmod 600 ~/.ssh/github_hostinger
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/github_hostinger
-
       - name: Deploy with ssh
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_REMOTE_SERVER_IP }}
           username: root
-          
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             eval "$(ssh-agent -s)"
             ssh-add ~/.ssh/github_hostinger
